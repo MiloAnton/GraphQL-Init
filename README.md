@@ -4,6 +4,6 @@
 ![MCD](./MCD_DBeaver.png)
 
 ## Fichiers principaux du rendu
-[SQL](./myefrei.sql)
-[JS](./index.js)
+[SQL](./myefrei.sql) / 
+[JS](./index.js) / 
 [Package.json](./package.json)
