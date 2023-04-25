@@ -64,22 +64,43 @@ CREATE TABLE IF NOT EXISTS `salle` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
 -- Création de la table des cours
+CREATE TABLE IF NOT EXISTS `etudiant` (
+    `idEtudiant` int(11) NOT NULL AUTO_INCREMENT,
+    `nomEtudiant` varchar(50) NOT NULL,
+    `prenomEtudiant` varchar(50) NOT NULL,
+    `emailEtudiant` varchar(50) NOT NULL,
+    `mdpEtudiant` varchar(50) NOT NULL,
+    `idGroupe` int(11) NOT NULL,
+    PRIMARY KEY (`idEtudiant`),
+    KEY `idGroupe` (`idGroupe`),
+    CONSTRAINT `etudiant_ibfk_1` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idGroupe`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+
+-- Création de la table des cours
 CREATE TABLE IF NOT EXISTS `cours` (
     `idCours` int(11) NOT NULL AUTO_INCREMENT,
     `idProfesseur` int(11) NOT NULL,
-    `idMatiere` int(11) NOT NULL,
     `idSalle` int(11) NOT NULL,
+    `idMatiere` int(11) NOT NULL,
     `dateCours` date NOT NULL,
     `heureDebutCours` time NOT NULL,
     `heureFinCours` time NOT NULL,
     PRIMARY KEY (`idCours`),
     KEY `idProfesseur` (`idProfesseur`),
-    KEY `idMatiere` (`idMatiere`),
-    KEY `idSalle` (`idSalle`),
     CONSTRAINT `cours_ibfk_1` FOREIGN KEY (`idProfesseur`) REFERENCES `professeur` (`idProfesseur`),
-    CONSTRAINT `cours_ibfk_2` FOREIGN KEY (`idMatiere`) REFERENCES `matiere` (`idMatiere`),
-    CONSTRAINT `cours_ibfk_3` FOREIGN KEY (`idSalle`) REFERENCES `salle` (`idSalle`)
+    CONSTRAINT `cours_ibfk_2` FOREIGN KEY (`idSalle`) REFERENCES `salle` (`idSalle`),
+    CONSTRAINT `cours_ibfk_3` FOREIGN KEY (`idMatiere`) REFERENCES `matiere` (`idMatiere`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+
+-- Création des liaisons cours <> etudiant
+CREATE TABLE IF NOT EXISTS `cours_etudiants` (
+    `idCours` int(11) NOT NULL,
+    `idEtudiant` int(11) NOT NULL,
+    PRIMARY KEY (`idCours`,`idEtudiant`),
+    KEY `idEtudiant` (`idEtudiant`),
+    CONSTRAINT `cours_etudiants_ibfk_1` FOREIGN KEY (`idCours`) REFERENCES `cours` (`idCours`),
+    CONSTRAINT `cours_etudiants_ibfk_2` FOREIGN KEY (`idEtudiant`) REFERENCES `etudiant` (`idEtudiant`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Création de la table des absences
 CREATE TABLE IF NOT EXISTS `absence` (
@@ -94,15 +115,27 @@ CREATE TABLE IF NOT EXISTS `absence` (
     CONSTRAINT `absence_ibfk_2` FOREIGN KEY (`idCours`) REFERENCES `cours` (`idCours`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
--- Création de la table des utilisateurs
-CREATE TABLE IF NOT EXISTS `utilisateur` (
-    `idUtilisateur` int(11) NOT NULL AUTO_INCREMENT,
-    `nomUtilisateur` varchar(50) NOT NULL,
-    `prenomUtilisateur` varchar(50) NOT NULL,
-    `emailUtilisateur` varchar(50) NOT NULL,
-    `mdpUtilisateur` varchar(50) NOT NULL,
+-- Création de la table des groupes de matières
+CREATE TABLE IF NOT EXISTS `groupeMatiere` (
+    `idGroupeMatiere` int(11) NOT NULL AUTO_INCREMENT,
     `idGroupe` int(11) NOT NULL,
-    PRIMARY KEY (`idUtilisateur`),
+    `idMatiere` int(11) NOT NULL,
+    PRIMARY KEY (`idGroupeMatiere`),
     KEY `idGroupe` (`idGroupe`),
-    CONSTRAINT `utilisateur_ibfk_1` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idGroupe`)
+    KEY `idMatiere` (`idMatiere`),
+    CONSTRAINT `groupeMatiere_ibfk_1` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idGroupe`),
+    CONSTRAINT `groupeMatiere_ibfk_2` FOREIGN KEY (`idMatiere`) REFERENCES `matiere` (`idMatiere`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+
+-- Création de la table des présences
+CREATE TABLE IF NOT EXISTS `presence` (
+    `idPresence` int(11) NOT NULL AUTO_INCREMENT,
+    `idEtudiant` int(11) NOT NULL,
+    `idCours` int(11) NOT NULL,
+    `datePresence` date NOT NULL,
+    PRIMARY KEY (`idPresence`),
+    KEY `idEtudiant` (`idEtudiant`),
+    KEY `idCours` (`idCours`),
+    CONSTRAINT `presence_ibfk_1` FOREIGN KEY (`idEtudiant`) REFERENCES `etudiant` (`idEtudiant`),
+    CONSTRAINT `presence_ibfk_2` FOREIGN KEY (`idCours`) REFERENCES `cours` (`idCours`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;

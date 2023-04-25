@@ -7,37 +7,101 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model editors {
-  idEditors   Int     @id @default(autoincrement())
-  nameEditors String  @db.VarChar(50)
-  games       games[]
+model absence {
+  idAbsence   Int      @id @default(autoincrement())
+  idEtudiant  Int
+  idCours     Int
+  dateAbsence DateTime @db.Date
+  etudiant    etudiant @relation(fields: [idEtudiant], references: [idEtudiant], onDelete: NoAction, onUpdate: NoAction, map: "absence_ibfk_1")
+  cours       cours    @relation(fields: [idCours], references: [idCours], onDelete: NoAction, onUpdate: NoAction, map: "absence_ibfk_2")
+
+  @@index([idCours], map: "idCours")
+  @@index([idEtudiant], map: "idEtudiant")
 }
 
-model games {
-  idGames   Int     @id @default(autoincrement())
-  nameGames String  @db.VarChar(50)
-  idEditors Int
-  editors   editors @relation(fields: [idEditors], references: [idEditors], onDelete: NoAction, onUpdate: NoAction, map: "games_ibfk_1")
-  stock     stock[]
+model cours {
+  idCours         Int        @id @default(autoincrement())
+  idProfesseur    Int
+  idMatiere       Int
+  idSalle         Int
+  dateCours       DateTime   @db.Date
+  heureDebutCours DateTime   @db.Time(0)
+  heureFinCours   DateTime   @db.Time(0)
+  absence         absence[]
+  professeur      professeur @relation(fields: [idProfesseur], references: [idProfesseur], onDelete: NoAction, onUpdate: NoAction, map: "cours_ibfk_1")
+  matiere         matiere    @relation(fields: [idMatiere], references: [idMatiere], onDelete: NoAction, onUpdate: NoAction, map: "cours_ibfk_2")
+  salle           salle      @relation(fields: [idSalle], references: [idSalle], onDelete: NoAction, onUpdate: NoAction, map: "cours_ibfk_3")
 
-  @@index([idEditors], map: "idEditors")
+  @@index([idMatiere], map: "idMatiere")
+  @@index([idProfesseur], map: "idProfesseur")
+  @@index([idSalle], map: "idSalle")
 }
 
-model stock {
-  idStock  Int    @id @default(autoincrement())
-  idGames  Int
-  idStores Int
-  units    Int
-  prices   Float? @db.Float
-  games    games  @relation(fields: [idGames], references: [idGames], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_1")
-  stores   stores @relation(fields: [idStores], references: [idStores], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_2")
+model etudiant {
+  idEtudiant     Int       @id @default(autoincrement())
+  nomEtudiant    String    @db.VarChar(50)
+  prenomEtudiant String    @db.VarChar(50)
+  emailEtudiant  String    @db.VarChar(50)
+  mdpEtudiant    String    @db.VarChar(50)
+  idGroupe       Int
+  absence        absence[]
+  groupe         groupe    @relation(fields: [idGroupe], references: [idGroupe], onDelete: NoAction, onUpdate: NoAction, map: "etudiant_ibfk_1")
+  note           note[]
 
-  @@index([idGames], map: "idGames")
-  @@index([idStores], map: "idStores")
+  @@index([idGroupe], map: "idGroupe")
 }
 
-model stores {
-  idStores   Int     @id @default(autoincrement())
-  nameStores String  @db.VarChar(75)
-  stock      stock[]
+model groupe {
+  idGroupe    Int           @id @default(autoincrement())
+  nomGroupe   String        @db.VarChar(50)
+  etudiant    etudiant[]
+  utilisateur utilisateur[]
+}
+
+model matiere {
+  idMatiere          Int     @id @default(autoincrement())
+  nomMatiere         String  @db.VarChar(50)
+  coefficientMatiere Int
+  cours              cours[]
+  note               note[]
+}
+
+model note {
+  idNote     Int      @id @default(autoincrement())
+  idMatiere  Int
+  idEtudiant Int
+  noteNote   Float    @db.Float
+  matiere    matiere  @relation(fields: [idMatiere], references: [idMatiere], onDelete: NoAction, onUpdate: NoAction, map: "note_ibfk_1")
+  etudiant   etudiant @relation(fields: [idEtudiant], references: [idEtudiant], onDelete: NoAction, onUpdate: NoAction, map: "note_ibfk_2")
+
+  @@index([idEtudiant], map: "idEtudiant")
+  @@index([idMatiere], map: "idMatiere")
+}
+
+model professeur {
+  idProfesseur     Int     @id @default(autoincrement())
+  nomProfesseur    String  @db.VarChar(50)
+  prenomProfesseur String  @db.VarChar(50)
+  emailProfesseur  String  @db.VarChar(50)
+  mdpProfesseur    String  @db.VarChar(50)
+  cours            cours[]
+}
+
+model salle {
+  idSalle       Int     @id @default(autoincrement())
+  nomSalle      String  @db.VarChar(50)
+  capaciteSalle Int
+  cours         cours[]
+}
+
+model utilisateur {
+  idUtilisateur     Int    @id @default(autoincrement())
+  nomUtilisateur    String @db.VarChar(50)
+  prenomUtilisateur String @db.VarChar(50)
+  emailUtilisateur  String @db.VarChar(50)
+  mdpUtilisateur    String @db.VarChar(50)
+  idGroupe          Int
+  groupe            groupe @relation(fields: [idGroupe], references: [idGroupe], onDelete: NoAction, onUpdate: NoAction, map: "utilisateur_ibfk_1")
+
+  @@index([idGroupe], map: "idGroupe")
 }
