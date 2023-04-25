@@ -1,1 +1,1 @@
-# GraphQL Init
+# GraphQL EFREI
