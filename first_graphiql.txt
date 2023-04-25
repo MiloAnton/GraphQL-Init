@@ -1,0 +1,38 @@
+query GetStudents {
+    getAllStudents {
+      id
+      nom
+      prenom
+    }
+  }
+  
+  query GetStudent {
+    getStudent(id: "1") {
+      id
+      nom
+      prenom
+    }
+  }
+  
+  mutation CreateAndUpdateStudent {
+    createStudent: createStudent(input: { nom: "Doe", prenom: "John" }) {
+      id
+      nom
+      prenom
+    }
+  
+    updateStudent: updateStudent(id: "1", input: { nom: "Smith", prenom: "Jane" }) {
+      id
+      nom
+      prenom
+    }
+  }
+  
+  mutation DeleteStudent {
+    deleteStudent(id: "2") {
+      id
+      nom
+      prenom
+    }
+  }
+  
