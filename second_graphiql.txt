@@ -1,0 +1,148 @@
+query getAll {
+  allGames {
+    idGames
+    nameGames
+    editor {
+      idEditors
+      nameEditors
+    }
+  }
+}
+
+query Archive {
+  allEditors {
+    idEditors
+    nameEditors
+    games {
+      idGames
+      nameGames
+    }
+  }
+  
+  allStocks {
+    idStock
+    game {
+      idGames
+      nameGames
+    }
+    store {
+      idStores
+      nameStores
+    }
+    units
+    prices
+  }
+  allStores {
+    idStores
+    nameStores
+    stocks {
+      idStock
+      game {
+        idGames
+        nameGames
+      }
+      units
+      prices
+    }
+  }
+}
+
+
+mutation createEditor {
+  createEditor(nameEditors: "New Editor") {
+    idEditors
+    nameEditors
+  }
+}
+
+mutation createGame {
+  createGame(nameGames: "New Game", idEditors: 1) {
+    idGames
+    nameGames
+    editor {
+      idEditors
+      nameEditors
+    }
+  }
+}
+
+mutation createStore {
+  createStore(nameStores: "New Store") {
+    idStores
+    nameStores
+  }
+}
+
+mutation createStock {
+  createStock(idGames: 1, idStores: 1, units: 10, prices: 59.99) {
+    idStock
+    game {
+      idGames
+      nameGames
+    }
+    store {
+      idStores
+      nameStores
+    }
+    units
+    prices
+  }
+}
+
+mutation updateEditor {
+  updateEditor(idEditors: 1, nameEditors: "Updated Editor") {
+    idEditors
+    nameEditors
+  }
+}
+
+mutation updateGame {
+  updateGame(idGames: 1, nameGames: "Updated Game", idEditors: 2) {
+    idGames
+    nameGames
+    editor {
+      idEditors
+      nameEditors
+    }
+  }
+}
+
+mutation updateStore {
+  updateStore(idStores: 1, nameStores: "Updated Store") {
+    idStores
+    nameStores
+  }
+}
+
+mutation updateStock {
+  updateStock(idStock: 1, idGames: 2, idStores: 1, units: 15, prices: 49.99) {
+    idStock
+    game {
+      idGames
+      nameGames
+    }
+    store {
+      idStores
+      nameStores
+    }
+    units
+    prices
+  }
+}
+
+mutation deleteEditor {
+  deleteEditor(idEditors: 1)
+}
+
+mutation deleteGame {
+  deleteGame(idGames: 1)
+}
+
+mutation deleteStore {
+  deleteStore(idStores: 1)
+}
+
+mutation deleteStock {
+  deleteStock(idStock: 1)
+}
+

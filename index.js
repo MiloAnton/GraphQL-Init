@@ -1,7 +1,7 @@
-const express = require('express');
-const { graphqlHTTP } = require('express-graphql');
-const { buildSchema } = require('graphql');
-const { PrismaClient } = require('@prisma/client');
+const express = require("express");
+const { graphqlHTTP } = require("express-graphql");
+const { buildSchema } = require("graphql");
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
@@ -15,7 +15,7 @@ const schema = buildSchema(`
   type Game {
     idGames: Int!
     nameGames: String!
-    editor: Editor!
+    editor: Editor
   }
 
   type Stock {
@@ -34,7 +34,7 @@ const schema = buildSchema(`
 
   type Query {
     allEditors: [Editor!]!
-    allGames: [Game!]!
+    allGames: [Game]
     allStocks: [Stock!]!
     allStores: [Store!]!
   }
@@ -58,36 +58,84 @@ const schema = buildSchema(`
 `);
 
 const rootValue = {
-  allEditors: () => prisma.editor.findMany(),
-  allGames: () => prisma.game.findMany(),
-  allStocks: () => prisma.stock.findMany(),
-  allStores: () => prisma.store.findMany(),
-  
-  createEditor: ({ nameEditors }) => prisma.editor.create({ data: { nameEditors } }),
-  createGame: ({ nameGames, idEditors }) => prisma.game.create({ data: { nameGames, editor: { connect: { idEditors } } } }),
-  createStore: ({ nameStores }) => prisma.store.create({ data: { nameStores } }),
-  createStock: ({ idGames, idStores, units, prices }) => prisma.stock.create({ data: { game: { connect: { idGames } }, store: { connect: { idStores } }, units, prices } }),
+  allEditors: async () => {return await prisma.editors.findMany()},
+  allGames: async () => {return await prisma.games.findMany()},
+  allStocks: async () => {return await prisma.stock.findMany()},
+  allStores: async () => {return await prisma.stores.findMany()},
 
-  updateEditor: ({ idEditors, nameEditors }) => prisma.editor.update({ where: { idEditors }, data: { nameEditors } }),
-  updateGame: ({ idGames, nameGames, idEditors }) => prisma.game.update({ where: { idGames }, data: { nameGames, editor: idEditors ? { connect: { idEditors } } : undefined } }),
-  updateStore: ({ idStores, nameStores }) => prisma.store.update({ where: { idStores }, data: { nameStores } }),
-  updateStock: ({ idStock, idGames, idStores, units, prices }) => prisma.stock.update({ where: { idStock }, data: { game: idGames ? { connect: { idGames } } : undefined, store: idStores ? { connect: { idStores } } : undefined, units, prices } }),
+  createEditor: ({ nameEditors }) =>
+    prisma.editors.create({ data: { nameEditors } }),
+  createGame: ({ nameGames, idEditors }) =>
+    prisma.games.create({
+      data: { nameGames, editors: { connect: { idEditors } } },
+    }),
+  createStore: ({ nameStores }) =>
+    prisma.stores.create({ data: { nameStores } }),
+  createStock: ({ idGames, idStores, units, prices }) =>
+    prisma.stock.create({
+      data: {
+        games: { connect: { idGames } },
+        stores: { connect: { idStores } },
+        units,
+        prices,
+      },
+    }),
 
-  deleteEditor: ({ idEditors }) => prisma.editor.delete({ where: { idEditors } }).then(() => true).catch(() => false),
-  deleteGame: ({ idGames }) => prisma.game.delete({ where: { idGames } }).then(() => true).catch(() => false),
-  deleteStore: ({ idStores }) => prisma.store.delete({ where: { idStores } }).then(() => true).catch(() => false),
-  deleteStock: ({ idStock }) => prisma.stock.delete({ where: { idStock } }).then(() => true).catch(() => false),
+  updateEditor: ({ idEditors, nameEditors }) =>
+    prisma.editors.update({ where: { idEditors }, data: { nameEditors } }),
+  updateGame: ({ idGames, nameGames, idEditors }) =>
+    prisma.games.update({
+      where: { idGames },
+      data: {
+        nameGames,
+        editors: idEditors ? { connect: { idEditors } } : undefined,
+      },
+    }),
+  updateStore: ({ idStores, nameStores }) =>
+    prisma.stores.update({ where: { idStores }, data: { nameStores } }),
+  updateStock: ({ idStock, idGames, idStores, units, prices }) =>
+    prisma.stock.update({
+      where: { idStock },
+      data: {
+        game: idGames ? { connect: { idGames } } : undefined,
+        stores: idStores ? { connect: { idStores } } : undefined,
+        units,
+        prices,
+      },
+    }),
 
+  deleteEditor: ({ idEditors }) =>
+    prisma.editors
+      .delete({ where: { idEditors } })
+      .then(() => true)
+      .catch(() => false),
+  deleteGame: ({ idGames }) =>
+    prisma.games
+      .delete({ where: { idGames } })
+      .then(() => true)
+      .catch(() => false),
+  deleteStore: ({ idStores }) =>
+    prisma.stores
+      .delete({ where: { idStores } })
+      .then(() => true)
+      .catch(() => false),
+  deleteStock: ({ idStock }) =>
+    prisma.stock
+      .delete({ where: { idStock } })
+      .then(() => true)
+      .catch(() => false),
 };
 
 const app = express();
 app.use(
-  '/graphql',
+  "/graphql",
   graphqlHTTP({
     schema,
     rootValue,
     graphiql: true,
-  }),
+  })
 );
 
-app.listen(4000, () => console.log('🚀 Server ready at http://localhost:4000/graphql'));
+app.listen(4000, () =>
+  console.log("🚀 Server ready at http://localhost:4000/graphql")
+);
